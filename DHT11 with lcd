@@ -1,0 +1,86 @@
+/* this program is used to display temperature and humidity using a DHT11 on an lcd */
+
+
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+#include <LiquidCrystal.h>// include the library code:
+const int rs = 7, en = 8, d4 = 9, d5 = 10, d6 = 11, d7 = 12;// the pins on arduino corresponding to those of the LCD:
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+#define DHTPIN 2     // Digital pin connected to the DHT sensor 
+// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
+// Pin 15 can work but DHT must be disconnected during program upload.
+
+// Uncomment the type of sensor in use:
+#define DHTTYPE    DHT11     // DHT 11
+//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+// See guide for details on sensor wiring and usage:
+//   https://learn.adafruit.com/dht/overview
+
+DHT_Unified dht(DHTPIN, DHTTYPE);
+
+uint32_t delayMS;
+
+void setup() {
+lcd.begin(16, 2);
+  // Initialize device.
+  dht.begin();
+  lcd.println(F("DHTxx Unified Sensor Example"));
+  // Print temperature sensor details.
+  sensor_t sensor;
+  dht.temperature().getSensor(&sensor);
+  lcd.println(F("------------------------------------"));
+  lcd.println(F("Temperature Sensor"));
+  lcd.print  (F("Sensor Type: ")); Serial.println(sensor.name);
+ lcd.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
+  lcd.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
+  lcd.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("°C"));
+  lcd.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("°C"));
+  lcd.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("°C"));
+  lcd.println(F("------------------------------------"));
+  // Print humidity sensor details.
+  dht.humidity().getSensor(&sensor);
+  lcd.println(F("Humidity Sensor"));
+  lcd.print  (F("Sensor Type: ")); Serial.println(sensor.name);
+  lcd.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
+  lcd.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
+  lcd.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("%"));
+  lcd.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("%"));
+  lcd.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("%"));
+  lcd.println(F("------------------------------------"));
+  // Set delay between sensor readings based on sensor details.
+  delayMS = sensor.min_delay / 1000;
+}
+
+void loop() {
+  // Delay between measurements.
+  delay(delayMS);
+  // Get temperature event and print its value.
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    lcd.println(F("Error reading temperature!"));
+    lcd.setCursor(0, 1);
+  }
+  else {
+    lcd.print(F("Temperature:"));
+    lcd.print(event.temperature);
+    lcd.println(F("°C"));
+    lcd.setCursor(0, 1);
+  }
+  // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    lcd.println(F("Error reading humidity!"));
+    lcd.setCursor(0, 0);
+  }
+  else {
+    lcd.print(F("Humidity: "));
+    lcd.print(event.relative_humidity);
+    lcd.println(F("%"));
+    lcd.setCursor(0, 0);
+  }
+}
