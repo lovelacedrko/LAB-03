@@ -1,0 +1,96 @@
+/*the purpose of this program is to display distance from the ultrasonic sensor and humidity on an lcd */
+
+// hook up HC-SRO4 with trig pin to arduino pin 3, echo to arduino pin 2
+#define trigPin 3
+#define echoPin 2
+ #include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+#include <LiquidCrystal.h>// include the library code:
+ float duration, distance;
+#include <LiquidCrystal.h>// include the library code:
+const int rs = 7, en = 8, d4 = 9, d5 = 10, d6 = 11, d7 = 12;// the pins on arduino corresponding to those of the LCD:
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+#define DHTPIN 4     // Digital pin connected to the DHT sensor 
+#define DHTTYPE    DHT11     // DHT 11
+DHT_Unified dht(DHTPIN, DHTTYPE);
+uint32_t delayMS;
+
+void setup() { 
+  lcd.begin(16, 2); // Initialize device.
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+ 
+ dht.begin();
+  lcd.println(F("DHTxx Unified Sensor Example"));
+  // Print humidity sensor details.
+   sensor_t sensor;
+  dht.humidity().getSensor(&sensor);
+  lcd.println(F("Humidity Sensor"));
+  lcd.print  (F("Sensor Type: ")); lcd.println(sensor.name);
+  lcd.print  (F("Driver Ver:  ")); lcd.println(sensor.version);
+  lcd.print  (F("Unique ID:   ")); lcd.println(sensor.sensor_id);
+  lcd.print  (F("Max Value:   ")); lcd.print(sensor.max_value); lcd.println(F("%"));
+  lcd.print  (F("Min Value:   ")); lcd.print(sensor.min_value); lcd.println(F("%"));
+  lcd.print  (F("Resolution:  ")); lcd.print(sensor.resolution); lcd.println(F("%"));
+  lcd.println(F("------------------------------------"));
+  // Set delay between sensor readings based on sensor details.
+  delayMS = sensor.min_delay / 1000;
+}
+
+void loop() {
+ 
+
+
+  // Delay between measurements.
+  delay(delayMS);
+  // Get temperature event and print its value.
+  sensors_event_t event;
+  
+  // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    lcd.println(F("Error reading humidity!"));
+    lcd.setCursor(0, 1);
+  }
+  else {
+    lcd.print(F("Humidity: "));
+    lcd.print(event.relative_humidity);
+    lcd.println(F("%"));
+    lcd.setCursor(0, 1);
+  }
+
+
+
+  // write a pulse to the HC-SR04 Trigger pin:
+digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+
+//measure the response from the HC-SR04 echo pin
+duration = pulseIn(echoPin, HIGH);
+
+//determine distance from duration
+//use 343 meters per sec as speed of sound
+
+distance =(duration / 2) * 0.0343;
+
+//send results to serialmonitor
+lcd.print("Distance = ");
+if (distance >= 400 || distance <= 2){
+  lcd.println("Out of range");
+lcd.setCursor(0, 1);// set the cursor to the top left:
+
+}
+else {
+  lcd.print(distance);
+  lcd.println(" cm ");
+  delay(500);
+lcd.setCursor(0, 1);// set the cursor to the top left:
+
+  }
+  delay(500);
+}
