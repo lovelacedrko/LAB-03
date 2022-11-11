@@ -1,0 +1,30 @@
+/* the purpose of this program is to use the urduino as a voltmeter to display voltage on an lcd */
+
+#include <LiquidCrystal.h>// include the library code:
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;// the pins on arduino corresponding to those of the LCD:
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+  
+
+void setup() {
+  lcd.begin(16, 2); // initialize LCD and set up the number of columns and rows:
+
+}
+
+void loop() {
+int bitValue= analogRead(A0);// read the potentiometer on A0:
+
+
+ float x = bitValue;
+float y =5.0/1023 * x;
+lcd.print("Voltage =");
+lcd.print(y);
+lcd.print("    ");
+lcd.setCursor(0, 1);
+
+lcd.print("bitValue =");
+lcd.print(bitValue);
+lcd.setCursor(0, 0);// set the cursor to the top left
+
+  
+ 
+}
