@@ -1,0 +1,27 @@
+/* the goal of this program is to use the arduino as an ohmmeter*/
+
+#include <LiquidCrystal.h>
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+  
+
+void setup() {
+  lcd.begin(16, 2); // initialize LCD and set up the number of columns and rows:
+
+}
+
+void loop() {
+int bitValue= analogRead(A0);// read the potentiometer on A0:
+
+ float x = bitValue;
+float y =5.0/1023 * x;
+float r = y/0.005;
+lcd.print("resistance ="); //display message
+lcd.print(r); // display resistance
+lcd.print("    "); // solves overlaping on lcd
+lcd.setCursor(0, 1);
+
+lcd.print("bitValue =");
+lcd.print(bitValue); // display bitvalue
+lcd.setCursor(0, 0); // set the cursor to the top left
+}
