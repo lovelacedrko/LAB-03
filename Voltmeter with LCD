@@ -13,12 +13,11 @@ void setup() {
 void loop() {
 int bitValue= analogRead(A0);// read the potentiometer on A0:
 
-
  float x = bitValue;
 float y =5.0/1023 * x;
-lcd.print("Voltage =");
-lcd.print(y);
-lcd.print("    ");
+lcd.print("Voltage =");//display message
+lcd.print(y);// display voltage
+lcd.print("    ");// solves overlaping on lcd
 lcd.setCursor(0, 1);
 
 lcd.print("bitValue =");
